@@ -8,9 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Service
 public class StringFacade {
@@ -37,7 +35,13 @@ public class StringFacade {
 
     public List<String> getLongestHunderdLines() {
         List<Path> paths = storageService.getAllFilePaths();
-        List<String> lines = new ArrayList<>();
+        TreeSet<String> lines = new TreeSet<>(new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return o1.length() < o2.length() ? 1:-1;
+            }
+        });
+
         paths.forEach(path -> {
             try {
                 lines.addAll(Files.readAllLines(path));
@@ -45,6 +49,7 @@ public class StringFacade {
                 throw new RuntimeException(e);
             }
         });
-        return lines;
+        List<String> linesList = lines.stream().toList();
+        return linesList.subList(0,Math.min(linesList.size(),100));
     }
 }
