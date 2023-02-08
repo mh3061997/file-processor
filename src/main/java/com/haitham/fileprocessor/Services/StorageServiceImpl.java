@@ -38,6 +38,7 @@ public class StorageServiceImpl implements StorageService {
         try {
             return Files.walk(this.path, 1)
                     .filter(path -> !path.equals(this.path))
+                    .sorted((o1, o2) -> {return o1.toFile().lastModified() < o2.toFile().lastModified() ? 1:-1;})
                     .collect(Collectors.toList());
         } catch (Exception e) {
             throw new RuntimeException("Could not load the files!");

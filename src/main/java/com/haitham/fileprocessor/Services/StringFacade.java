@@ -19,10 +19,15 @@ public class StringFacade {
     public StringFacade(StorageService storageService) {
         this.storageService = storageService;
     }
-    public String getRandomLine() throws IOException {
+
+    public Path getRandomFile() {
         List<Path> paths = storageService.getAllFilePaths();
         int numFile = new Random().nextInt(paths.size());
-        Path filePath = paths.get(numFile);
+        return paths.get(numFile);
+    }
+
+    public String getRandomLine() throws IOException {
+        Path filePath = getRandomFile();
         List<String> lines = Files.readAllLines(filePath);
         int lineNumber = new Random().nextInt(lines.size());
         return lines.get(lineNumber);
@@ -33,12 +38,12 @@ public class StringFacade {
         return new StringBuilder().append(line).reverse().toString();
     }
 
-    public List<String> getLongestHunderdLines() {
-        List<Path> paths = storageService.getAllFilePaths();
+
+    public List<String> getLongestNLines(int numLines, List<Path> paths) {
         TreeSet<String> lines = new TreeSet<>(new Comparator<String>() {
             @Override
             public int compare(String o1, String o2) {
-                return o1.length() < o2.length() ? 1:-1;
+                return o1.length() < o2.length() ? 1 : -1;
             }
         });
 
@@ -50,6 +55,21 @@ public class StringFacade {
             }
         });
         List<String> linesList = lines.stream().toList();
-        return linesList.subList(0,Math.min(linesList.size(),100));
+        return linesList.subList(0, Math.min(linesList.size(), numLines));
+    }
+
+    public List<String> getLongestHunderdLines() {
+        List<Path> paths = storageService.getAllFilePaths();
+        return getLongestNLines(100, paths);
+    }
+
+    public List<String> getLongestTwentyLines(boolean useLatestFile) {
+        List<Path> paths = new ArrayList<>();
+        if(useLatestFile){
+            paths.add(storageService.getAllFilePaths().get(0));
+        }else{
+            paths.add(getRandomFile());
+        }
+        return getLongestNLines(20, paths);
     }
 }

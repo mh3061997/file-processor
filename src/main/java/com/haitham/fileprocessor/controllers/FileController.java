@@ -53,7 +53,7 @@ public class FileController {
     }
 
     @GetMapping(value = "20-lines")
-    ResponseEntity<List<String>> twentyLines() {
-        return null;
+    ResponseEntity<List<String>> twentyLines(@RequestParam(defaultValue = "true") boolean useLatestFile) {
+        return ResponseEntity.ok(stringFacade.getLongestTwentyLines(useLatestFile));
     }
 }
