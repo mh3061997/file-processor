@@ -7,17 +7,18 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.stream.Stream;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class StorageServiceImpl implements StorageService {
 
-    private final Path path = Paths.get("files");
+    public final Path path = Paths.get("files");
 
     StorageServiceImpl() throws Exception {
         this.init();
     }
+
     @Override
     public void init() throws Exception {
         try {
@@ -33,14 +34,12 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public ArrayList<MultipartFile> getAllFiles() {
-        return null;
-    }
-
-    public Stream<Path> loadAll() {
+    public List<Path> getAllFilePaths() {
         try {
-            return Files.walk(this.path, 1).filter(path -> !path.equals(this.path)).map(this.path::relativize);
-        } catch (IOException e) {
+            return Files.walk(this.path, 1)
+                    .filter(path -> !path.equals(this.path))
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
             throw new RuntimeException("Could not load the files!");
         }
     }
