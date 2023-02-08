@@ -1,5 +1,6 @@
 package com.haitham.fileprocessor.Services;
 
+import com.haitham.fileprocessor.models.RandomLineDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,11 +27,36 @@ public class StringFacade {
         return paths.get(numFile);
     }
 
+    Character getMostFrequentLetter(String str) {
+        HashMap<Character, Integer> frequencyMap = new HashMap<>();
+        char[] chars = str.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            frequencyMap.put(chars[i], frequencyMap.getOrDefault(chars[i], 0) + 1);
+        }
+        Integer maxFreq = Integer.MIN_VALUE;
+        Character maxChar = null;
+        for(Map.Entry<Character,Integer> entry: frequencyMap.entrySet()){
+            if(entry.getValue() > maxFreq){
+                maxFreq = entry.getValue();
+                maxChar = entry.getKey();
+            }
+        }
+        return maxChar;
+    }
+
     public String getRandomLine() throws IOException {
         Path filePath = getRandomFile();
         List<String> lines = Files.readAllLines(filePath);
         int lineNumber = new Random().nextInt(lines.size());
         return lines.get(lineNumber);
+    }
+
+    public RandomLineDto getRandomLineDto() throws IOException {
+        Path filePath = getRandomFile();
+        List<String> lines = Files.readAllLines(filePath);
+        int lineNumber = new Random().nextInt(lines.size());
+        String line = lines.get(lineNumber);
+        return new RandomLineDto(lineNumber, line,filePath.getFileName().toString(), getMostFrequentLetter(line));
     }
 
     public String getRandomLineBackward() throws IOException {
@@ -65,9 +91,9 @@ public class StringFacade {
 
     public List<String> getLongestTwentyLines(boolean useLatestFile) {
         List<Path> paths = new ArrayList<>();
-        if(useLatestFile){
+        if (useLatestFile) {
             paths.add(storageService.getAllFilePaths().get(0));
-        }else{
+        } else {
             paths.add(getRandomFile());
         }
         return getLongestNLines(20, paths);

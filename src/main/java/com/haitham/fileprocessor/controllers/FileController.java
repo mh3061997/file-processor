@@ -3,6 +3,7 @@ package com.haitham.fileprocessor.controllers;
 import com.haitham.fileprocessor.Services.StorageService;
 import com.haitham.fileprocessor.Services.StringFacade;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,8 +39,13 @@ public class FileController {
     }
 
     @GetMapping(value = "random-line")
-    ResponseEntity<String> randomLine() throws IOException {
-        return ResponseEntity.ok(stringFacade.getRandomLine());
+    ResponseEntity<?> randomLine(@RequestHeader(HttpHeaders.ACCEPT) String acceptHeader) throws IOException {
+        if (acceptHeader.equals("*/*") || acceptHeader.equals("application/*")) {
+            return ResponseEntity.ok(stringFacade.getRandomLineDto());
+
+        }else {
+            return ResponseEntity.ok(stringFacade.getRandomLine());
+        }
     }
 
     @GetMapping(value = "backward-random-line")
